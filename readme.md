@@ -25,4 +25,6 @@ Dans le cadre de ce projet, nous souhaitons reproduire certaines expériences d�
 
 # Références
 
-Playing Atari With Deep Reinforcement Learning, de V. Mnih, K. Kavukcuoglu, D. Silver, A. Graves, I. Antonoglou, D. Wierstra, and M. Riedmiller. In NIPS Deep Learning Workshop, 2013.
+ - Playing Atari With Deep Reinforcement Learning, de V. Mnih, K. Kavukcuoglu, D. Silver, A. Graves, I. Antonoglou, D. Wierstra, and M. Riedmiller. In NIPS Deep Learning Workshop, 2013.
+ -  Deep Learning de Ian Goodfellow and Yoshua Bengio and Aaron Courville, MIT Press 2016, http://www.deeplearningbook.org.
+
