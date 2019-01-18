@@ -1,0 +1,8 @@
+17/01/19 : Premières tentatives d'installation des librairies Python
+18/01/19 : Le livre Tensorflow pour le deep
+learning" de Ramsundar et Zadeh (O'Reilly 2018) est en notre possession
+
+
+TODO_LIST :
+Objectif Mercredi 16/01/19
+Nathan/Aurélien : Réussir à installer les librairies et commencer à le le livre
