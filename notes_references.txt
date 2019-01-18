@@ -1,3 +1,6 @@
 https://www.youtube.com/watch?v=0jh-jlWfKwo : explique la propagation et la rétropropagation sur un exemple. ++++
 
 http://helios.mi.parisdescartes.fr/~bouzy/Doc/AA1/ReseauxDeNeurones1.pdf : exemple d'apprentissage du XOR
+
+http://www.statsoft.fr/concepts-statistiques/reseaux-de-neurones-automatises/reseaux-de-neurones-automatises.htm#.XEIiWdHfuhA
+utilite des differentes fonctions dactivation 
