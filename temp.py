@@ -8,11 +8,11 @@ pygame.init()
 
 
 screen = pygame.display.set_mode((640, 400))
-player = pygame.image.load('Documents/flap.gif').convert()
-background = pygame.image.load('Documents/fond2.png').convert()
-tuyau_bas = pygame.image.load('Documents/tuy_bas.png').convert()
-tuyau_haut = pygame.image.load('Documents/tuy_haut.png').convert()
-game_over = pygame.image.load('Documents/game_over.jpg').convert()
+player = pygame.image.load('flap.gif').convert()
+background = pygame.image.load('fond2.png').convert()
+tuyau_bas = pygame.image.load('tuy_bas.png').convert()
+tuyau_haut = pygame.image.load('tuy_haut.png').convert()
+game_over = pygame.image.load('game_over.jpg').convert()
 
 ax=0
 ay=-9
