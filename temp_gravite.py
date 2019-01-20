@@ -39,7 +39,7 @@ class GameObject:
 		def move(self):
 			##self.pos = self.pos.move(self.speed, 0)
 			self.pos[0] = self.pos[0] + 20
-			self.pos[1] = self.pos[1] + trajY[self.traj]
+			self.pos[1] = self.pos[1] +g
 			if self.pos[0] > 640:
 				self.pos[0] = 0
 				return uniform(200,400)
@@ -48,9 +48,9 @@ class GameObject:
 			self.traj += 1
 			return -1
 		def go_up(self,speed_y):
-			self.traj = 0
+			self.pos[1] -= g*3
 		def go_down(self,speed_y):
-			self.traj = 0
+			self.pos[1] = self.pos[1] + g*3
 
 ##pygame.display.flip()
 
