@@ -8,11 +8,11 @@ pygame.init()
 
 
 screen = pygame.display.set_mode((640, 400))
-player = pygame.image.load('Documents/flap.gif').convert()
-background = pygame.image.load('Documents/fond2.png').convert()
-tuyau_bas = pygame.image.load('Documents/tuy_bas.png').convert()
-tuyau_haut = pygame.image.load('Documents/tuy_haut.png').convert()
-game_over = pygame.image.load('Documents/game_over.jpg').convert()
+player = pygame.image.load('flap.gif').convert()
+background = pygame.image.load('fond2.png').convert()
+tuyau_bas = pygame.image.load('tuy_bas.png').convert()
+tuyau_haut = pygame.image.load('tuy_haut.png').convert()
+game_over = pygame.image.load('game_over.jpg').convert()
 
 ax=0
 ay=-9
@@ -107,10 +107,11 @@ while 1:
 	pygame.time.delay(100)
 
 screen.blit(background,(0,0))
-##screen.blit(game_over,(100,0))
+screen.blit(game_over,(100,0))
 font = pygame.font.Font(None, 36)
 text = font.render("your score is : " + str(count), 1, Color("white"))
-textpos = text.get_rect(centerx=background.get_width()-50)
+textpos = text.get_rect(centerx=background.get_width()/2)
+screen.blit(text,textpos)
 pygame.display.update()
 pygame.time.delay(2000)
 
