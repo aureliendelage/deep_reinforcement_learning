@@ -42,10 +42,10 @@ class GameObject:
 ##pygame.display.flip()
 
 objects = []
-o = GameObject
+o = GameObject()
 GameObject.init(o,player,200,20)
 
-for x in range(10):                 #Créer 10 objets
+for x in range(10):
 
 	GameObject.move(o)
 	objects.append(o)
