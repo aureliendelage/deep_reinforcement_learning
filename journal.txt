@@ -1,8 +1,11 @@
 17/01/19 : Premières tentatives d'installation des librairies Python
 18/01/19 : Le livre Tensorflow pour le deep
 learning" de Ramsundar et Zadeh (O'Reilly 2018) est en notre possession
-
+21/01/19 : flappyBird est très largement avancé: deux versions sont
+fonctionnelles (avec ou sans gravite), mais des améliorations sont possibles,
+comme sur l'aparition des tuyaux..
 
 TODO_LIST :
-Objectif Mercredi 16/01/19
+Objectif Mercredi 23/01/19
 Nathan/Aurélien : Réussir à installer les librairies et commencer à le le livre
+                  S'intéresser à TensorFlow
