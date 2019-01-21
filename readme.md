@@ -32,3 +32,4 @@ Dans le cadre de ce projet, nous souhaitons reproduire certaines expériences d�
 
  - Pour lancer flappyBird, il faut lancer la commande : python temp.py ou python temp_gravite.py pour avoir la version gérant la gravite.
  - Il faut avoir installé la librairie Pygame
+ - Il faut utiliser les flèches directionnelles haut et bas du clavier pour se déplacer.
