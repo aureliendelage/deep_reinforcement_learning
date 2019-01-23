@@ -4,3 +4,7 @@ http://helios.mi.parisdescartes.fr/~bouzy/Doc/AA1/ReseauxDeNeurones1.pdf : exemp
 
 http://www.statsoft.fr/concepts-statistiques/reseaux-de-neurones-automatises/reseaux-de-neurones-automatises.htm#.XEIiWdHfuhA
 utilite des differentes fonctions dactivation 
+
+https://www.youtube.com/watch?v=xuBzQ38DNhE&feature=youtu.be&fbclid=IwAR2H5IAoddyCOyYOIpFR6_Ikh7B27PuN3cnTOLGfXA5dKE1FuiOhm0d2PAs
+
+https://www.youtube.com/watch?v=aircAruvnKk
