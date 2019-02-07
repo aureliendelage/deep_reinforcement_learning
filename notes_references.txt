@@ -8,3 +8,5 @@ utilite des differentes fonctions dactivation
 https://www.youtube.com/watch?v=xuBzQ38DNhE&feature=youtu.be&fbclid=IwAR2H5IAoddyCOyYOIpFR6_Ikh7B27PuN3cnTOLGfXA5dKE1FuiOhm0d2PAs
 
 https://www.youtube.com/watch?v=aircAruvnKk
+
+https://playground.tensorflow.org/#activation=tanh&batchSize=10&dataset=circle&regDataset=reg-plane&learningRate=0.03&regularizationRate=0&noise=0&networkShape=3&seed=0.39477&showTestData=false&discretize=false&percTrainData=50&x=true&y=true&xTimesY=false&xSquared=true&ySquared=true&cosX=false&sinX=false&cosY=false&sinY=false&collectStats=false&problem=regression&initZero=false&hideText=false
