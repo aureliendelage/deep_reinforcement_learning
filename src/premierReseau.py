@@ -35,8 +35,8 @@ plt.xlabel("x")
 plt.ylabel("y")
 plt.xlim(0, 1)
 plt.title("Toy Linear Regression Data, "r"$y = 5x + 2 + N(0, 1)$")
-plt.show()
-"""
+#plt.show()
+
 #Génération d'un graphe TensorFlow
 with tf.name_scope("placeholders"): #données d'entrée
   x = tf.placeholder(tf.float32, (N, 1))
@@ -49,7 +49,7 @@ with tf.name_scope("prediction"): #y calculés avec les poids du graphe
 with tf.name_scope("loss"): #fonction de perte
   l = tf.reduce_sum((y - tf.squeeze(y_pred))**2)
 with tf.name_scope("optim"): #fonction d'optimisation
-	train_op = tf.train.AdamOptimizer(.001).minimize(l)
+	train_op = tf.train.AdamOptimizer(.01).minimize(l)
 
 
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
@@ -58,7 +58,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 
 train_writer = tf.summary.FileWriter('/tmp/lr-train', tf.get_default_graph())
 
-n_steps = 20000 #nombre d'entrainements
+n_steps = 5000 #nombre d'entrainements
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
   #entraiement du réseau
@@ -71,4 +71,5 @@ with tf.Session() as sess:
   # récupération de w et b
   w_final, b_final = sess.run([W, b])
   print("w final %f, b final %f" % (w_final,b_final))
-"""
+  plt.plot([0,1],[b_final, w_final+b_final],'r')
+  plt.show()
