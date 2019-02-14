@@ -24,7 +24,7 @@ plt.xlim(-0.5,1.5)
 ## affichage des points dans R^2
 
 ##plt.show()
-
+hidden = 3
 
 def pearson_r2_score(y, y_pred):
   """Computes Pearson R^2 (square of Pearson correlation)."""
@@ -34,35 +34,27 @@ def pearson_r2_score(y, y_pred):
 
 
 
-
-
-
-hidden = 2
-
-
-#Génération d'un graphe TensorFlow
 with tf.name_scope("placeholders"): #données d'entrée
-  x = tf.placeholder(tf.float32, shape = [4,2])
-  y = tf.placeholder(tf.float32, shape = [4,1])
+	  x = tf.placeholder(tf.float32, shape = [4,2])
+	  y = tf.placeholder(tf.float32, shape = [4,1])
 with tf.name_scope("layer_1"):
   print("shape of x : ",x.shape)
   W = tf.Variable(tf.random_normal([2, hidden]))  ## 
   b = tf.Variable(tf.zeros([hidden])) ## biais pour les hidden neurones cachés
   layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
-
 with tf.name_scope("out_layer"):
-  ##print("shape of layer_1 : ",layer_1.shape)
-  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
-  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
-  yy = tf.matmul(layer_1,W1) + b1
-  y_sigm = tf.sigmoid(yy)
-  y_pred = tf.round(y_sigm)
-  print("shape of y_pred : ",y_pred.shape)
+	  ##print("shape of layer_1 : ",layer_1.shape)
+	  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
+	  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
+	  yy = tf.matmul(layer_1,W1) + b1
+	  y_sigm = tf.sigmoid(yy)
+	  y_pred = tf.round(y_sigm)
+	  print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
-  entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
-  l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
+	  entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
+	  l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
 with tf.name_scope("optim"): #fonction d'optimisation
-  train_op = tf.train.AdamOptimizer(.01).minimize(l)
+	  train_op = tf.train.AdamOptimizer(.01).minimize(l)
 
 
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
@@ -75,26 +67,34 @@ train_writer = tf.summary.FileWriter('/tmp/xor-train', tf.get_default_graph())
 n_steps = 2000 #nombre d'entrainements
 
 with tf.Session() as sess:
-  sess.run(tf.global_variables_initializer())
-  #entraiement du réseau
-  for i in range(n_steps):
-    feed_dict = {x: x_xor, y: y_xor}
-    _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-    print("step %d, loss: %f" % (i, loss))
-    train_writer.add_summary(summary, i)
 
-  """
+  reussi = False
+  while not reussi :
+    sess.run(tf.global_variables_initializer())
+    #entraiement du réseau
+    for i in range(n_steps):
+      feed_dict = {x: x_xor, y: y_xor}
+      _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
+      print("step %d, loss: %f" % (i, loss))
+      train_writer.add_summary(summary, i)
+    if loss<0.1 :
+      reussi = True
+
+
+  
   nb_elem = 100
   x_plan = np.linspace(0,1,nb_elem)
   X,Y = np.meshgrid(x_plan,x_plan)
   Z = np.zeros(X.shape)
 
-  for e1 in X :
-    for e2 in Y :
-      x_xor = [[e1,e2],[e1,e2],[e1,e2],[e1,e2]]
-      _,_,_,_,y_pred = sess.run([W,b,W1, b1,y_pred],feed_dict = {x:x_xor})"""
+  for e1 in range(nb_elem) :
+    for e2 in range(nb_elem) :
+      x_xor = [[x_plan[e1],x_plan[e2]],[0,0],[0,0],[0,0]]
+      res = sess.run(y_pred,feed_dict = {x:x_xor})
+      Z[e1,e2] = res[0,0]
 
-
+  plt.pcolor(X,Y,Z)
+  plt.show()
 
 
   x_xor = [[0.9,0.1],[0.9,0.1],[0.9,0.1],[0.9,0.1]]
