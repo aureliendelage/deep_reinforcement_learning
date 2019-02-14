@@ -36,7 +36,7 @@ W = tf.Variable(tf.random_normal((2, 1)))
 
 
 
-hidden = 3
+hidden = 2
 
 
 #Génération d'un graphe TensorFlow
@@ -47,7 +47,7 @@ with tf.name_scope("layer_1"):
   print("shape of x : ",x.shape)
   W = tf.Variable(tf.random_normal([2, hidden]))  ## 1*2 x 2x3 = 1*3
   b = tf.Variable(tf.zeros([hidden])) ## biais pour les 3 neurones cachés
-  layer_1 = tf.matmul(x,W) + b
+  layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
 with tf.name_scope("out_layer"):
   ##print("shape of layer_1 : ",layer_1.shape)
   W1 = tf.Variable(tf.random_normal([hidden,1])) ## 1*3 x 3*2  = 1*2 <=> 2 classes ! ( 0 ou 1 )
@@ -58,9 +58,9 @@ with tf.name_scope("out_layer"):
   print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
   entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
-  l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
+  l = tf.reduce_mean(entropy) ## on minimise l'erreur quadratique moyenne
 with tf.name_scope("optim"): #fonction d'optimisation
-  train_op = tf.train.AdamOptimizer(.1).minimize(l)
+  train_op = tf.train.AdamOptimizer(.01).minimize(l)
 
 
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
@@ -70,7 +70,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/lr2-train', tf.get_default_graph())
 
 
-n_steps = 5000 #nombre d'entrainements
+n_steps = 100000 #nombre d'entrainements
 
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
