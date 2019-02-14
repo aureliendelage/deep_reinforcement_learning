@@ -1,13 +1,16 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
+import random
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
 import numpy as np
 tf.InteractiveSession()
 
 
-x_xor = [[0,0],[0,1],[1,0],[1,1]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
+#x_xor = [[0,0],[0,1],[1,0],[1,1]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
+#x_xor = [[0+abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[0+abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
+x_xor = [[random.uniform(0,0.5),random.uniform(0,0.5)],[random.uniform(0,0.5),random.uniform(0.5,1)],[random.uniform(0.5,1),random.uniform(0,0.5)],[random.uniform(0.5,1),random.uniform(0.5,1)]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
 y_xor = [[0],[1],[1],[0]] ## et leurs résultats par la fonction xor
 X1 = []
 X2 = []
@@ -24,7 +27,7 @@ plt.xlim(-0.5,1.5)
 ## affichage des points dans R^2
 
 ##plt.show()
-hidden = 3
+hidden = 20
 
 def pearson_r2_score(y, y_pred):
   """Computes Pearson R^2 (square of Pearson correlation)."""
@@ -64,7 +67,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/xor-train', tf.get_default_graph())
 
 
-n_steps = 2000 #nombre d'entrainements
+n_steps = 4000 #nombre d'entrainements
 
 with tf.Session() as sess:
 
