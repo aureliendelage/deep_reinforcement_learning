@@ -7,7 +7,7 @@ tf.InteractiveSession()
 
 
 x_xor = [[0,0],[0,1],[1,0],[1,1]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
-y_xor = [0,1,1,0] ## et leurs résultats par la fonction xor
+y_xor = [[0],[1],[1],[0]] ## et leurs résultats par la fonction xor
 X1 = []
 X2 = []
 
@@ -42,24 +42,25 @@ hidden = 3
 #Génération d'un graphe TensorFlow
 with tf.name_scope("placeholders"): #données d'entrée
   x = tf.placeholder(tf.float32, shape = [4,2])
-  y = tf.placeholder(tf.float32, shape = [4,])
+  y = tf.placeholder(tf.float32, shape = [4,1])
 with tf.name_scope("layer_1"):
   print("shape of x : ",x.shape)
   W = tf.Variable(tf.random_normal([2, hidden]))  ## 1*2 x 2x3 = 1*3
   b = tf.Variable(tf.zeros([hidden])) ## biais pour les 3 neurones cachés
   layer_1 = tf.matmul(x,W) + b
 with tf.name_scope("out_layer"):
-  print("shape of layer_1 : ",layer_1.shape)
-  W = tf.Variable(tf.random_normal([hidden,1])) ## 1*3 x 3*2  = 1*2 <=> 2 classes ! ( 0 ou 1 )
-  b = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
-  yy = tf.matmul(layer_1,W) + b
+  ##print("shape of layer_1 : ",layer_1.shape)
+  W1 = tf.Variable(tf.random_normal([hidden,1])) ## 1*3 x 3*2  = 1*2 <=> 2 classes ! ( 0 ou 1 )
+  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
+  yy = tf.matmul(layer_1,W1) + b1
   y_sigm = tf.sigmoid(yy)
   y_pred = tf.round(y_sigm)
   print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
-  l = tf.reduce_sum((y - tf.squeeze(y_pred))**2) ## on minimise l'erreur quadratique moyenne
+  entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
+  l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
 with tf.name_scope("optim"): #fonction d'optimisation
-  train_op = tf.train.AdamOptimizer(.01).minimize(l)## c'est un optimiseur basé sur la descente de gradient. (Rq.: une norme n'est pas différentiable en 0,..)
+  train_op = tf.train.AdamOptimizer(.1).minimize(l)
 
 
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
