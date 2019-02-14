@@ -70,7 +70,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/lr2-train', tf.get_default_graph())
 
 
-n_steps = 100000 #nombre d'entrainements
+n_steps = 2000 #nombre d'entrainements
 
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
@@ -82,16 +82,18 @@ with tf.Session() as sess:
     train_writer.add_summary(summary, i)
 
   # récupération de w et b
-  w_final, b_final = sess.run([W, b])
-  print("w final %f, b final %f" % (w_final,b_final))
+  w,b,w1, b1 = sess.run([W,b,W1, b1])
+  y_predit = tf.matmul(tf.matmul([0,0],W)+b,W1+b1)
+  print(y_predit)
+  ##print("y_prédit: " + y_predit.eval())
+  ##print("w final %f, b final %f" % (w_final,b_final))
 
-  # prédictions	
-  y_pred = sess.run(y_pred, feed_dict={x: x_xor})
-
+  # prédictions
+'''  
 plt.clf()
 plt.xlabel("Y-true")
 plt.ylabel("Y-pred")
 plt.scatter(y_xor, y_pred)
 plt.show()
-
+'''
 
