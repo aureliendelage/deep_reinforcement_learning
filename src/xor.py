@@ -12,8 +12,8 @@ X1 = []
 X2 = []
 
 for i in range(4):
-	X1.append(x_xor[i][0])
-	X2.append(x_xor[i][1])
+    X1.append(x_xor[i][0])
+    X2.append(x_xor[i][1])
 plt.scatter(X1,X2)
 plt.xlabel("x")
 plt.ylabel("y")
@@ -29,7 +29,7 @@ def pearson_r2_score(y, y_pred):
   """Computes Pearson R^2 (square of Pearson correlation)."""
   return pearsonr(y, y_pred)[0]**2
 
-W = tf.Variable(tf.random_normal((2, 1)))
+#W = tf.Variable(tf.random_normal((2, 1)))
 
 
 
@@ -47,7 +47,7 @@ with tf.name_scope("layer_1"):
   print("shape of x : ",x.shape)
   W = tf.Variable(tf.random_normal([2, hidden]))  ## 1*2 x 2x3 = 1*3
   b = tf.Variable(tf.zeros([hidden])) ## biais pour les 3 neurones cachés
-  layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
+  layer_1 = tf.nn.relu(tf.sigmoid(tf.matmul(x,W) + b))
 with tf.name_scope("out_layer"):
   ##print("shape of layer_1 : ",layer_1.shape)
   W1 = tf.Variable(tf.random_normal([hidden,1])) ## 1*3 x 3*2  = 1*2 <=> 2 classes ! ( 0 ou 1 )
@@ -67,10 +67,10 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
   tf.summary.scalar("loss", l)
   merged = tf.summary.merge_all()
 
-train_writer = tf.summary.FileWriter('/tmp/lr2-train', tf.get_default_graph())
+train_writer = tf.summary.FileWriter('/tmp/xor-train', tf.get_default_graph())
 
 
-n_steps = 10000 #nombre d'entrainements
+n_steps = 2000 #nombre d'entrainements
 
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
@@ -82,16 +82,18 @@ with tf.Session() as sess:
     train_writer.add_summary(summary, i)
 
   # récupération de w et b
-  #w_final, b_final = sess.run([W, b])
-  #print("w final %f, b final %f" % (w_final,b_final))
+  #w,b,w1, b1 = sess.run([W,b,W1, b1])
+  #print("b: " + b1)
+  ##y_predit = tf.matmul(tf.matmul([0,0],W)+b,W1+b1)
+  ##print(y_predit)
+  ##print("y_prédit: " + y_predit.eval())
+  ##print("w final %f, b final %f" % (w_final,b_final))
 
-  # prédictions	
-  y_pred = sess.run(y_pred, feed_dict={x: x_xor})
-
+  # prédictions
+''' 
 plt.clf()
 plt.xlabel("Y-true")
 plt.ylabel("Y-pred")
 plt.scatter(y_xor, y_pred)
 plt.show()
-
-
+'''
