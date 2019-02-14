@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
+import numpy as np
 tf.InteractiveSession()
 
 
@@ -45,12 +46,13 @@ with tf.name_scope("placeholders"): #données d'entrée
   y = tf.placeholder(tf.float32, shape = [4,1])
 with tf.name_scope("layer_1"):
   print("shape of x : ",x.shape)
-  W = tf.Variable(tf.random_normal([2, hidden]))  ## 1*2 x 2x3 = 1*3
-  b = tf.Variable(tf.zeros([hidden])) ## biais pour les 3 neurones cachés
-  layer_1 = tf.nn.relu(tf.sigmoid(tf.matmul(x,W) + b))
+  W = tf.Variable(tf.random_normal([2, hidden]))  ## 
+  b = tf.Variable(tf.zeros([hidden])) ## biais pour les hidden neurones cachés
+  layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
+
 with tf.name_scope("out_layer"):
   ##print("shape of layer_1 : ",layer_1.shape)
-  W1 = tf.Variable(tf.random_normal([hidden,1])) ## 1*3 x 3*2  = 1*2 <=> 2 classes ! ( 0 ou 1 )
+  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
   b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
   yy = tf.matmul(layer_1,W1) + b1
   y_sigm = tf.sigmoid(yy)
@@ -58,7 +60,7 @@ with tf.name_scope("out_layer"):
   print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
   entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
-  l = tf.reduce_mean(entropy) ## on minimise l'erreur quadratique moyenne
+  l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
 with tf.name_scope("optim"): #fonction d'optimisation
   train_op = tf.train.AdamOptimizer(.01).minimize(l)
 
@@ -81,12 +83,28 @@ with tf.Session() as sess:
     print("step %d, loss: %f" % (i, loss))
     train_writer.add_summary(summary, i)
 
-  # récupération de w et b
-  #w,b,w1, b1 = sess.run([W,b,W1, b1])
-  #print("b: " + b1)
-  ##y_predit = tf.matmul(tf.matmul([0,0],W)+b,W1+b1)
+  """
+  nb_elem = 100
+  x_plan = np.linspace(0,1,nb_elem)
+  X,Y = np.meshgrid(x_plan,x_plan)
+  Z = np.zeros(X.shape)
+
+  for e1 in X :
+    for e2 in Y :
+      x_xor = [[e1,e2],[e1,e2],[e1,e2],[e1,e2]]
+      _,_,_,_,y_pred = sess.run([W,b,W1, b1,y_pred],feed_dict = {x:x_xor})"""
+
+
+
+
+  x_xor = [[0.9,0.1],[0.9,0.1],[0.9,0.1],[0.9,0.1]]
+  y_predr = sess.run(y_pred,feed_dict = {x:x_xor})
+  """print("b1:  ",b1[0])
+  print("b: ",b)
+  print("w:  ",w)
+  print("w1:  ",w1)"""
   ##print(y_predit)
-  ##print("y_prédit: " + y_predit.eval())
+  print("y_prédit: ",y_predr)
   ##print("w final %f, b final %f" % (w_final,b_final))
 
   # prédictions
