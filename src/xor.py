@@ -36,13 +36,7 @@ plt.xlim(-0.5,1.5)
 ## affichage des points dans R^2
 
 ##plt.show()
-
 hidden = 5
-
-"""hidden = 2
-hidden_2 = 2
-hidden_3 = 2"""
-
 
 def pearson_r2_score(y, y_pred):
   """Computes Pearson R^2 (square of Pearson correlation)."""
@@ -62,9 +56,9 @@ with tf.name_scope("layer_1"):
   layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
 with tf.name_scope("out_layer"):
 	  ##print("shape of layer_1 : ",layer_1.shape)
-	  W1 = tf.Variable(tf.random_normal([hidden_3,1])) ##
+	  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
 	  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
-	  yy = tf.matmul(layer_3,W1) + b1
+	  yy = tf.matmul(layer_1,W1) + b1
 	  y_sigm = tf.sigmoid(yy)
 	  y_pred = tf.round(y_sigm)
 	  print("shape of y_pred : ",y_pred.shape)
@@ -82,9 +76,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/xor-train', tf.get_default_graph())
 
 
-
 n_steps = 5000 #nombre d'entrainements
-
 
 with tf.Session() as sess:
 
