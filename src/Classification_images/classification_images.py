@@ -18,7 +18,7 @@ print("img : ",img)
 
 
 # On charge les données : X contient 60000 images de 784 pixels, et y contient les 60000 resultats attendus
-X, y = loadlocal_mnist(
+X, y_charge = loadlocal_mnist(
         images_path='train-images.idx3-ubyte', 
         labels_path='train-labels.idx1-ubyte')
 
@@ -27,12 +27,12 @@ print('Dimensions: %s x %s' % (X.shape[0], X.shape[1]))
 print('\n1st row', X[0])
 print('valeur associée : %s' % (y[0]))"""
 
-N = 1000
+N = 10000
 taille_entree = X.shape[1]
 X_entre = X[:N]
 y_att = np.zeros((N,10))
 for i in range(N) :
-	y_att[i,y[i]] = 1
+	y_att[i,y_charge[i]] = 1
 
 
 hidden1 = 16
@@ -43,12 +43,10 @@ with tf.name_scope("placeholders"): #données d'entrée
 	  x = tf.placeholder(tf.float32, (N,taille_entree))
 	  y = tf.placeholder(tf.float32, (N,10))
 with tf.name_scope("layer_1"):
-  print("shape of x : ",x.shape)
   W1 = tf.Variable(tf.random_normal([taille_entree, hidden1]))  ## 
   b1 = tf.Variable(tf.zeros([hidden1])) ## biais pour les hidden neurones cachés
   layer_1 = tf.sigmoid(tf.matmul(x,W1) + b1)
 with tf.name_scope("layer_2"):
-  print("deuxième couche")
   W2 = tf.Variable(tf.random_normal([hidden1, hidden2]))  ## 
   b2 = tf.Variable(tf.zeros([hidden2])) ## biais pour les hidden neurones cachés
   layer_2 = tf.sigmoid(tf.matmul(layer_1,W2) + b2)
@@ -74,14 +72,15 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/digit', tf.get_default_graph())
 
 
-n_steps = 5000
+n_steps = 2000
 with tf.Session() as sess:
   sess.run(tf.global_variables_initializer())
   #entraiement du réseau
+  print("entrainement en cours")
   for i in range(n_steps):
     feed_dict = {x: X_entre, y: y_att}
     _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-    #print("step %d, loss: %f" % (i, loss))
+    print("step %d, loss: %f" % (i, loss))
     train_writer.add_summary(summary, i)
 
 
@@ -98,6 +97,27 @@ with tf.Session() as sess:
   	return pred
 
   print(predire(0))
+
+  def resultat(tab) :
+  	vmax=tab[0]
+  	imax=0
+  	for i in range(1,10) :
+  		if vmax<tab[i] :
+  			vmax = tab[i]
+  			imax = i
+  	return imax
+
+  pred = sess.run(y_pred,feed_dict={x: X_entre})
+  totaux = np.zeros(10)
+  reussi = np.zeros(10)
+  for i in range(N) :
+  	totaux[y_charge[i]]+=1
+  	if y_charge[i] == resultat(pred[i]) :
+  		reussi[y_charge[i]]+=1
+
+  for i in range(10) :
+  	print( i , "reconnu à ", 100*reussi[i]/totaux[i], "%")
+
 
 
 
