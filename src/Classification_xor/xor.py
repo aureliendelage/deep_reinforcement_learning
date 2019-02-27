@@ -7,7 +7,8 @@ from scipy.stats import pearsonr
 import numpy as np
 tf.InteractiveSession()
 
-N = 1000 #taille du jeu de données
+nb_elem = 100
+N = nb_elem*nb_elem #taille du jeu de données
 
 #x_xor = [[0,0],[0,1],[1,0],[1,1]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
 #x_xor = [[0+abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[0+abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
@@ -35,7 +36,13 @@ plt.xlim(-0.5,1.5)
 ## affichage des points dans R^2
 
 ##plt.show()
+
 hidden = 5
+
+"""hidden = 2
+hidden_2 = 2
+hidden_3 = 2"""
+
 
 def pearson_r2_score(y, y_pred):
   """Computes Pearson R^2 (square of Pearson correlation)."""
@@ -55,10 +62,11 @@ with tf.name_scope("layer_1"):
   layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
 with tf.name_scope("out_layer"):
 	  ##print("shape of layer_1 : ",layer_1.shape)
-	  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
+	  W1 = tf.Variable(tf.random_normal([hidden_3,1])) ##
 	  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
-	  yy = tf.matmul(layer_1,W1) + b1
-	  y_pred = tf.sigmoid(yy)
+	  yy = tf.matmul(layer_3,W1) + b1
+	  y_sigm = tf.sigmoid(yy)
+	  y_pred = tf.round(y_sigm)
 	  print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
 	  entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
@@ -74,7 +82,9 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
 train_writer = tf.summary.FileWriter('/tmp/xor-train', tf.get_default_graph())
 
 
+
 n_steps = 5000 #nombre d'entrainements
+
 
 with tf.Session() as sess:
 
@@ -87,16 +97,15 @@ with tf.Session() as sess:
       _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
       print("step %d, loss: %f" % (i, loss))
       train_writer.add_summary(summary, i)
-    if loss<10000 :
+    if loss<500 :
       reussi = True
 
 
   
-  x_plan = np.linspace(0,1,N)
+  x_plan = np.linspace(0,1,nb_elem)
   X,Y = np.meshgrid(x_plan,x_plan)
   Z = np.zeros(X.shape)
 
-  """
   x_test = []
   for e1 in x_plan :
     for e2 in x_plan :
@@ -106,13 +115,7 @@ with tf.Session() as sess:
 
   for e1 in range(nb_elem) :
     for e2 in range(nb_elem) :
-      Z[e1,e2] = res[nb_elem*e1+e2,0]"""
-  for i in range(N) :
-    x_test = []
-    for j in range(N) :
-      x_test.append([x_plan[i],x_plan[j]])
-    res = sess.run(y_pred,feed_dict = {x:x_test})
-    Z[i] = np.squeeze(res)
+      Z[e1,e2] = res[nb_elem*e1+e2,0]
 
   plt.pcolor(X,Y,Z)
   plt.show()
