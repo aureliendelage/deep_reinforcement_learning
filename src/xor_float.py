@@ -7,8 +7,7 @@ from scipy.stats import pearsonr
 import numpy as np
 tf.InteractiveSession()
 
-nb_elem = 100
-N = nb_elem*nb_elem #taille du jeu de données
+N = 1000 #taille du jeu de données
 
 #x_xor = [[0,0],[0,1],[1,0],[1,1]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
 #x_xor = [[0+abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[0+abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),0+abs(random.gauss(0,0.25))],[1-abs(random.gauss(0,0.25)),1-abs(random.gauss(0,0.25))]] ## on déclare les variables d'entrées (placeholders). Stockée en mode [[x11,x12],...] et on fera x11 xor x12
@@ -59,8 +58,7 @@ with tf.name_scope("out_layer"):
 	  W1 = tf.Variable(tf.random_normal([hidden,1])) ##
 	  b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
 	  yy = tf.matmul(layer_1,W1) + b1
-	  y_sigm = tf.sigmoid(yy)
-	  y_pred = tf.round(y_sigm)
+	  y_pred = tf.sigmoid(yy)
 	  print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
 	  entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
@@ -89,7 +87,7 @@ with tf.Session() as sess:
       _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
       print("step %d, loss: %f" % (i, loss))
       train_writer.add_summary(summary, i)
-    if loss<500 :
+    if loss<10000 :
       reussi = True
 
 
@@ -98,6 +96,7 @@ with tf.Session() as sess:
   X,Y = np.meshgrid(x_plan,x_plan)
   Z = np.zeros(X.shape)
 
+"""
   x_test = []
   for e1 in x_plan :
     for e2 in x_plan :
@@ -107,7 +106,14 @@ with tf.Session() as sess:
 
   for e1 in range(nb_elem) :
     for e2 in range(nb_elem) :
-      Z[e1,e2] = res[nb_elem*e1+e2,0]
+      Z[e1,e2] = res[nb_elem*e1+e2,0]"""
+
+  for i in range(N) :
+    x_test = []
+    for j in range(N) :
+      x_test.append([x_plan[i],x_plan[j]])
+    res = sess.run(y_pred,feed_dict = {x:x_test})
+    Z[i] = res
 
   plt.pcolor(X,Y,Z)
   plt.show()
