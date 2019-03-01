@@ -19,8 +19,8 @@ print("img : ",img)
 
 # On charge les données : X contient 60000 images de 784 pixels, et y contient les 60000 resultats attendus
 X, y_charge = loadlocal_mnist(
-        images_path='train-images.idx3-ubyte', 
-        labels_path='train-labels.idx1-ubyte')
+        images_path='/home/etudiants/barloy2u/2A/PIDR/telecom_2019_deep_rl/src/Classification_images/train-images.idx3-ubyte', 
+        labels_path='/home/etudiants/barloy2u/2A/PIDR/telecom_2019_deep_rl/src/Classification_images/train-labels.idx1-ubyte')
 
 """
 print('Dimensions: %s x %s' % (X.shape[0], X.shape[1]))
@@ -62,7 +62,7 @@ with tf.name_scope("out_layer"):
 with tf.name_scope("loss"): #fonction de perte
 	  l = tf.losses.mean_squared_error(y_att, y_pred)
 with tf.name_scope("optim"): #fonction d'optimisation
-	  train_op = tf.train.AdamOptimizer(.01).minimize(l)
+	  train_op = tf.train.AdamOptimizer(.02).minimize(l)
 
 
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
@@ -107,16 +107,21 @@ with tf.Session() as sess:
   			imax = i
   	return imax
 
-  pred = sess.run(y_pred,feed_dict={x: X_entre})
+
+  X_test = X[N:2*N]
+  y_test = y_charge[N:2*N]
+
+  pred = sess.run(y_pred,feed_dict={x: X_test})
   totaux = np.zeros(10)
   reussi = np.zeros(10)
   for i in range(N) :
-  	totaux[y_charge[i]]+=1
-  	if y_charge[i] == resultat(pred[i]) :
-  		reussi[y_charge[i]]+=1
+  	totaux[y_test[i]]+=1
+  	if y_test[i] == resultat(pred[i]) :
+  		reussi[y_test[i]]+=1
 
   for i in range(10) :
   	print( i , "reconnu à ", 100*reussi[i]/totaux[i], "%")
+  print( "total de reconnaissance : ", 100*sum(reussi)/sum(totaux), "%")
 
 
 
