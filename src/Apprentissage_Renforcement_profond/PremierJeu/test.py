@@ -1,8 +1,9 @@
+import sys
 import os
 import random
 import numpy as np
 
-
+sys.setrecursionlimit(1000)
 ##(0,0): coin en bas à gauche
 ## 0 : haut
 ## 1 : droite
@@ -22,69 +23,96 @@ def AtCenter(x,y):
 	if (x==4):
 		return 1
 
-def Fonction_Valeur(x,y,n,board,marqued):
-	Afficher_board(Board,0)
-	if (marqued[x][y]):
+def Fonction_Valeur(x,y,n,Board,marqued):
+	##Afficher_Board(Board,n)
+	print(Marqued)
+	if (Marqued[x][y]):
 		print("marque")
-		return -10
-	else:
-		marqued[x][y] = 1
-	##board[x][y] = max([board[x][y]*Fonction_probabilite[x][y][1]+Fonction_Valeur(x+1,y,n+1)])
+		exit(0)
+	##Board[x][y] = max([Board[x][y]*Fonction_probabilite[x][y][1]+Fonction_Valeur(x+1,y,n+1)])
 	if (x==4 and y==4):
-		Afficher_board(Board,n)
+		Afficher_Board(Board,n)
+		print("je suis à x==4 et y==4")
 		return 1
 	else:
+		Marqued[x][y] = 1
 		a = -2
 		b = -2
 		c = -2
 		d = -2
 		try:
-			a = board[x][y]*Fonction_probabilite[x][y][1]+Fonction_Valeur(x+1,y,n+1,Board,marqued)
+			if (Marqued[x+1][y] ==0):
+				a = Board[x+1][y]*Fonction_probabilite[x][y][1]+Fonction_Valeur(x+1,y,n+1,Board,Marqued)
+				print ("a vaut : ",a)
+				Marqued[x+1][y] = 1
+			else:
+				a = Board[x+1][y]
 		except:
+			print ("fonct: ",Fonction_probabilite[x][y][1],"Board : ",Board[x][y])
 			print ("je ne peux pas aller à droite, x : ",x," y : ",y)
 		try:
-			b = board[x][y]*Fonction_probabilite[x][y][0]+Fonction_Valeur(x,y+1,n+1,Board,marqued)
+			if (Marqued[x][y+1] ==0):
+				b = Board[x][y+1]*Fonction_probabilite[x][y][0]+Fonction_Valeur(x,y+1,n+1,Board,Marqued)
+				print ("b vaut : ",b)
+				Marqued[x][y+1] = 1
+			else:
+				a = Board[x][y+1]
 		except:
 			print("je ne peux pas aller en haut, x : ",x," y : ",y)
 		try:
-			c = board[x][y]*Fonction_probabilite[x][y][3]+Fonction_Valeur(x-1,y,n+1,Board,marqued)
+			if (Marqued[x-1][y] ==0):
+				c = Board[x-1][y]*Fonction_probabilite[x][y][3]+Fonction_Valeur(x-1,y,n+1,Board,Marqued)
+				print ("c vaut : ",c)
+				Marqued[x-1][y] = 1
+			else:
+				a = Board[x-1][y]
 		except:
 			print("je ne peux pas aller à gauche, x : ",x," y : ",y)
 		try:
-			d = board[x][y]*Fonction_probabilite[x][y][2]+Fonction_Valeur(x,y-1,n+1,Board,marqued)
+			if (Marqued[x][y-1] ==0):
+				d = Board[x][y-1]*Fonction_probabilite[x][y][2]+Fonction_Valeur(x,y-1,n+1,Board,Marqued)
+				print ("d vaut : ",d)
+				Marqued[x][y-1] = 1
+			else:
+				a = Board[x][y-1]
 		except:
 			print("je ne peux pas aller en bas, x : ",x," y : ",y)
+		print("a : ",a,"b : ",b," c :",c," d : ",d)
 		print ("max : ",max(a,b,c,d))
+		index = [a,b,c,d].index(max(a,b,c,d))
+		print("le max est en ",index)
+		print("je met à jour le board")
 		Board[x][y] = max(a,b,c,d)
-		return a
+		Afficher_Board(Board,n)
+		return Board[x][y]
 
 
 Board = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,1]]
 
 
 
-def Afficher_board(board,n):
-	print(" \n \n étape : ",n,"board : ")
-	print(" | ",board[4][0]," | ",board[4][1]," | ",board[4][2]," | ",board[4][3]," | ",board[4][4]," | ")
-	print(" | ",board[3][0]," | ",board[3][1]," | ",board[3][2]," | ",board[3][3]," | ",board[3][4]," | ")
-	print(" | ",board[2][0]," | ",board[2][1]," | ",board[2][2]," | ",board[2][3]," | ",board[2][4]," | ")
-	print(" | ",board[1][0]," | ",board[1][1]," | ",board[1][2]," | ",board[1][3]," | ",board[1][4]," | ")
-	print(" | ",board[0][0]," | ",board[0][1]," | ",board[0][2]," | ",board[0][3]," | ",board[0][4]," | ")
+def Afficher_Board(Board,n):
+	print(" \n \n étape : ",n,"Board : ")
+	print(" | ",Board[4][0]," | ",Board[4][1]," | ",Board[4][2]," | ",Board[4][3]," | ",Board[4][4]," | ")
+	print(" | ",Board[3][0]," | ",Board[3][1]," | ",Board[3][2]," | ",Board[3][3]," | ",Board[3][4]," | ")
+	print(" | ",Board[2][0]," | ",Board[2][1]," | ",Board[2][2]," | ",Board[2][3]," | ",Board[2][4]," | ")
+	print(" | ",Board[1][0]," | ",Board[1][1]," | ",Board[1][2]," | ",Board[1][3]," | ",Board[1][4]," | ")
+	print(" | ",Board[0][0]," | ",Board[0][1]," | ",Board[0][2]," | ",Board[0][3]," | ",Board[0][4]," | ")
 
 
 '''
-Fonction_probabilite = [[[0.0,0.5,0.5,0.0],[0.0,0.5,0.5,0.5],[0.0,0.5,0.5,0.5],[0.0,0.5,0.5,0.5],[0.0,0.5,0.5,0.0]],
+Fonction_probabilite = [[[round(random.random(),2),0.5,0.5,round(random.random(),2)],[round(random.random(),2),0.5,0.5,0.5],[0.0,0.5,0.5,0.5],[0.0,0.5,0.5,0.5],[0.0,0.5,0.5,0.0]],
 					   [[0.5,0.5,0.5,0.0],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.0,0.5,0.5]],
 					   [[0.5,0.5,0.5,0.0],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.0,0.5,0.5]],
 					   [[0.5,0.5,0.5,0.0],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.5,0.5,0.5],[0.5,0.0,0.5,0.5]],
 					   [[0.5,0.5,0.0,0.0],[0.5,0.5,0.0,0.5],[0.5,0.5,0.0,0.5],[0.5,0.5,0.0,0.5],[0.5,0.0,0.0,0.5]]]
 
 '''
-Fonction_probabilite = [[[0.0,round(random.random(),1),round(random.random(),1),0.0],[0.0,round(random.random(),1),round(random.random(),1),round(random.random(),1)],[0.0,round(random.random(),1),round(random.random(),1),round(random.random(),1)],[0.0,round(random.random(),1),round(random.random(),1),round(random.random(),1)],[0.0,round(random.random(),1),round(random.random(),1),0.0]],
-					   [[round(random.random(),1),round(random.random(),1),round(random.random(),1),0.0],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),0.0,round(random.random(),1),round(random.random(),1)]],
-					   [[round(random.random(),1),round(random.random(),1),round(random.random(),1),0.0],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),0.0,round(random.random(),1),round(random.random(),1)]],
-					   [[round(random.random(),1),round(random.random(),1),round(random.random(),1),0.0],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),round(random.random(),1),round(random.random(),1),round(random.random(),1)],[round(random.random(),1),0.0,round(random.random(),1),round(random.random(),1)]],
-					   [[round(random.random(),1),round(random.random(),1),0.0,0.0],[round(random.random(),1),round(random.random(),1),0.0,round(random.random(),1)],[round(random.random(),1),round(random.random(),1),0.0,round(random.random(),1)],[round(random.random(),1),round(random.random(),1),0.0,round(random.random(),1)],[round(random.random(),1),0.0,0.0,round(random.random(),1)]]]
+Fonction_probabilite = [[[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)]],
+					   [[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)]],
+					   [[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)]],
+					   [[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)]],
+					   [[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)],[round(random.random(),2),round(random.random(),2),round(random.random(),2),round(random.random(),2)]]]
 
 print(" \n \nfonction de probabilité:")
 print(" | ",Fonction_probabilite[0][0]," | ",Fonction_probabilite[0][1]," | ",Fonction_probabilite[0][2]," | ",Fonction_probabilite[0][3]," | ",Fonction_probabilite[0][4]," | ")
@@ -93,6 +121,6 @@ print(" | ",Fonction_probabilite[2][0]," | ",Fonction_probabilite[2][1]," | ",Fo
 print(" | ",Fonction_probabilite[3][0]," | ",Fonction_probabilite[3][1]," | ",Fonction_probabilite[3][2]," | ",Fonction_probabilite[3][3]," | ",Fonction_probabilite[3][4]," | ")
 print(" | ",Fonction_probabilite[4][0]," | ",Fonction_probabilite[4][1]," | ",Fonction_probabilite[4][2]," | ",Fonction_probabilite[4][3]," | ",Fonction_probabilite[4][4]," | ")
 
-marqued = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-Fonction_Valeur(0,0,0,Board,marqued)
+Marqued = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+Fonction_Valeur(0,0,0,Board,Marqued)
 
