@@ -28,10 +28,10 @@ def coord2num(c) :
 def num2coord(x) :
 	return [x//width, x%width]
 
-goUp = [0,-1]
-goDown = [0,1]
-goRight = [1,0]
-goLeft = [-1,0]
+goUp = [-1,0]
+goDown = [1,0] #1 0
+goRight = [0,1] 
+goLeft = [0,-1]
 
 
 def affichage() :
@@ -53,7 +53,7 @@ def affichage() :
 	print(str)
 
 def movable(pos) :
-	if 0<=pos[0] and pos[0]<height and 0<=pos[1] and pos[1]<width and (pos!=wall).all() :
+	if 0<=pos[0] and pos[0]<height and 0<=pos[1] and pos[1]<width and (pos!=wall).any() :
 		return True
 	return False
 
@@ -76,19 +76,20 @@ def move(dir) : # 0 pour haut, 1 pour droite, 2 pour bas, 3 pour gauche
 			position = np.add(position,goLeft)
 
 def realMove(dir,param) :
+	newdir = dir
 	a = random.random()
 	if a<((1-param)/2) :
-		dir = (dir-1)%4
+		newdir = (dir-1)%4
 	elif a<(1-param) :
-		dir = (dir+1)%4
-	move(dir)
+		newdir = (dir+1)%4
+	move(newdir)
 
 def isEnded() :
 	if np.equal(position,end).all() or np.equal(position,hole).all() :
 		return True
 	return False
 
-N = 1
+N = 10
 for i in range(N) :
 	position=[0,0]
 	while not isEnded() :
@@ -99,6 +100,8 @@ for i in range(N) :
 		newState = coord2num(position)
 		Q[oldState,direction] = (1-alpha)*Q[oldState,direction] + alpha*(r[position[0],position[1]]+gamma*max(Q[newState]))
 		print("Q(",oldState,",",direction,") = ",Q[oldState,direction],"\n\n")
+	print("---------------------nouvelle partie----------------------\n")
 	
 print(Q)
+
 
