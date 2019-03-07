@@ -20,7 +20,7 @@ r[hole[0],hole[1]]=-10
 Q = np.zeros([states_n,actions_n])
 alpha = 0.1
 gamma = 0.9
-probExp = 1
+probExp = 0.9
 
 def coord2num(c) :
 	return width*c[0]+c[1]
@@ -89,19 +89,31 @@ def isEnded() :
 		return True
 	return False
 
-N = 10
+
+
+N = 100000
 for i in range(N) :
 	position=[0,0]
 	while not isEnded() :
-		affichage()
+		#affichage()
 		direction = random.randrange(4)
 		oldState = coord2num(position)
 		realMove(direction,probExp)
 		newState = coord2num(position)
 		Q[oldState,direction] = (1-alpha)*Q[oldState,direction] + alpha*(r[position[0],position[1]]+gamma*max(Q[newState]))
-		print("Q(",oldState,",",direction,") = ",Q[oldState,direction],"\n\n")
-	print("---------------------nouvelle partie----------------------\n")
+		#print("Q(",oldState,",",direction,") = ",Q[oldState,direction],"\n\n")
+	#print("---------------------nouvelle partie----------------------\n")
 	
 print(Q)
 
+def parcours() :
+	global position
+	position = [0,0]
 
+	while not isEnded() :
+
+		affichage()
+		direction = np.argmax(Q[coord2num(position)])
+		move(direction)
+
+parcours()
