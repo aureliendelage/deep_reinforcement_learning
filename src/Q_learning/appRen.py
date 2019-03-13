@@ -7,6 +7,7 @@ width = 5
 height = 4
 states_n = width*height
 actions_n = 4
+t=0
 
 map = np.zeros([height,width])
 hole = [1,2]
@@ -21,6 +22,7 @@ Q = np.zeros([states_n,actions_n])
 alpha = 0.1
 gamma = 0.9
 probExp = 0.9
+coeffExploration = 0.1
 
 def coord2num(c) :
 	return width*c[0]+c[1]
@@ -89,14 +91,23 @@ def isEnded() :
 		return True
 	return False
 
+def choixDirection() :
+	a = random.random()
+	if a<coeffExploration : #cas d'exploration
+		return random.randrange(4)
+	else : #cas d'exploitation
+		return np.argmax(Q[coord2num(position)])
 
-
-N = 100000
+N = 10000
 for i in range(N) :
 	position=[0,0]
+	t=0
 	while not isEnded() :
+		t+=1
+		alpha = 1/t
 		#affichage()
-		direction = random.randrange(4)
+		#direction = random.randrange(4)
+		direction = choixDirection()
 		oldState = coord2num(position)
 		realMove(direction,probExp)
 		newState = coord2num(position)
@@ -105,6 +116,7 @@ for i in range(N) :
 	#print("---------------------nouvelle partie----------------------\n")
 	
 print(Q)
+
 
 def parcours() :
 	global position
