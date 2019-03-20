@@ -16,3 +16,6 @@ http://www.isir.upmc.fr/UserFiles/File/Sigaud/rl.pdf
 
 
 http://univ.scholarvox.com.bases-doc.univ-lorraine.fr/book/88855199
+
+
+https://github.com/sourabhv/FlapPyBird
