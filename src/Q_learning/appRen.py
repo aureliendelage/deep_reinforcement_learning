@@ -5,33 +5,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #propriétés du plateau
-width = 5
-height = 4
+width = 10
+height = 6
 states_n = width*height
 actions_n = 4
+t=0
 
 #positionnement des éléments
-hole = [1,2]
-wall = [3,0]
-end = [3,4]
+hole = [[1,2],[4,4],[2,8]]
+malusHole = [-15,-20,-20]
+wall = [[3,0],[5,8]]
+end = [[3,4],[5,3]]
+bonusEnd = [1,100]
 position = [0,0]
 
 #fonction de récompense imédiate associée a la position sur le plateau
 r = np.zeros([height,width])
-r[end[0],end[1]]=10
-r[hole[0],hole[1]]=-10
+for i in range(len(hole)) :
+	r[hole[i][0], hole[i][1]] = malusHole[i]
+for i in range(len(end)) :
+	r[end[i][0], end[i][1]] = bonusEnd[i]
 
 #fonction de valeur
 Q = np.zeros([states_n,actions_n])
 
 #paramètres de l'epérience
-gamma = 0.9
+gamma = 0.99
 probExp = 0.9
 
 def calculCoeffExp(i,N) :
 	"""calcul le coefficient d'exploration.
 	Varie de manière linéaire sur N expériences"""
-	c = (N-i)/N
+	c = (2*N-i)/(2*N)
 	return c
 
 def coord2num(c) :
@@ -48,6 +53,23 @@ goDown = [1,0]
 goRight = [0,1] 
 goLeft = [0,-1]
 
+def isWall(position) :
+	for w in wall :
+		if np.equal(position,w).all() :
+			return True
+	return False
+
+def isEnd(position) :
+	for e in end :
+		if np.equal(position,e).all() :
+			return True
+	return False
+
+def isHole(position) :
+	for h in hole :
+		if np.equal(position,h).all() :
+			return True
+	return False
 
 def affichage() :
 	"""fonction d'affichage du plateau"""
@@ -56,11 +78,11 @@ def affichage() :
 		for j in range(width) :
 			if np.equal([i,j],position).all() :
 				str+="x"
-			elif np.equal([i,j],wall).all() :
+			elif isWall([i,j]) :
 				str+="#"
-			elif np.equal([i,j],end).all() :
+			elif isEnd([i,j]) :
 				str+="@"
-			elif np.equal([i,j],hole).all() :
+			elif isHole([i,j]) :
 				str+="o"
 			else :
 				str+="."
@@ -77,7 +99,7 @@ def sommeQ(Q) :
 
 def movable(pos) :
 	"""retourne si la position pos est atteignable"""
-	if 0<=pos[0] and pos[0]<height and 0<=pos[1] and pos[1]<width and (pos!=wall).any() :
+	if 0<=pos[0] and pos[0]<height and 0<=pos[1] and pos[1]<width and not isWall(pos) :
 		return True
 	return False
 
@@ -115,7 +137,7 @@ def realMove(dir,param) :
 
 def isEnded() :
 	"""indique si le jeu est fini"""
-	if np.equal(position,end).all() or np.equal(position,hole).all() :
+	if isEnd(position) or isHole(position) :
 		return True
 	return False
 
@@ -130,7 +152,7 @@ def choixDirection() :
 
 
 
-N = 1000 #nombre d'epériences
+N = 10000 #nombre d'epériences
 
 #listes utiles pour affichage de la courbe de la somme de Q
 tmp = [i for i in range(N+1)]
@@ -143,6 +165,7 @@ for i in range(N) :
 	position=[0,0]
 	t=0
 	coeffExploration = calculCoeffExp(i,N)
+	
 
 	while not isEnded() : #on joue jusqu'à la fin
 		
@@ -163,14 +186,18 @@ for i in range(N) :
 	
 	sumQ.append(sommeQ(Q)) #maj de la somme des valeurs de Q
 	
-#print(Q)
+
+def indice(liste,elem) :
+	for i in range(len(liste)) :
+		if np.equal(elem,liste[i]).all() :
+			return i
+	return -1
 
 
 def affSol():
 	"""affiche la solution trouvée a partir de Q"""
-	#ne marche pas pour l'instant
 	global position
-	position = [0,0]
+	position = np.array([0,0])
 	chemin = [position]
 
 	while not isEnded() :
@@ -178,24 +205,25 @@ def affSol():
 		move(direction)
 		chemin.append(position)
 
-	print(chemin.index([0,0]).__str__())
-	str = ""
+	string = ""
 	for i in range(height) :
 		for j in range(width) :
-			for p in chemin :
-				if np.equal([i,j],p).all() :
-					str+=chemin.index([i,j]).__str__()
-			if np.equal([i,j],wall).all() :
-				str+="#"
-			elif np.equal([i,j],end).all() :
-				str+="@"
-			elif np.equal([i,j],hole).all() :
-				str+="o"
+
+			ind = indice(chemin,[i,j])
+			
+			if isWall([i,j]) :
+				string+="#"
+			elif isEnd([i,j]) :
+				string+="@"
+			elif isHole([i,j]) :
+				string+="o"
+			elif ind>=0 :
+				string+=str(ind)
 			else :
-				str+="."
-		str+="\n"
-	str+="\n"
-	print(str)
+				string+="."
+		string+="\n"
+	string+="\n"
+	print(string)
 
 
 
@@ -210,9 +238,9 @@ def parcours() :
 		direction = np.argmax(Q[coord2num(position)])
 		move(direction)
 
-parcours()
+affSol()
 
 #affichage de l'évolution de la somme des valeurs de Q
 plt.plot(tmp, sumQ)
-plt.show()
-plt.figure()
+#plt.show()
+#plt.figure()
