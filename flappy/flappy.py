@@ -1,5 +1,3 @@
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from itertools import cycle
 import random
 import sys
@@ -8,42 +6,30 @@ import pygame
 from pygame.locals import *
 import time
 import tensorflow as tf
-import numpy as np
 
-
+temps = time.time()
 
 hidden = 16;
-hidden1 = 16;
-hidden2 = 16;
-hidden3 = 16;
 
-N = 1;
-taille_entree = 5;
-
+'''
 with tf.name_scope("placeholders"): #données d'entrée
-    x = tf.placeholder(tf.float32, (1,5))
-    y = tf.placeholder(tf.float32,(1,1))
+    x = tf.placeholder(tf.float32, (5,1))
 with tf.name_scope("layer_1"):
-  W1 = tf.Variable(tf.random_normal([taille_entree, hidden1]))  ## 
-  b1 = tf.Variable(tf.zeros([hidden1])) ## biais pour les hidden neurones cachés
-  layer_1 = tf.sigmoid(tf.matmul(x,W1) + b1)
-with tf.name_scope("layer_2"):
-  W2 = tf.Variable(tf.random_normal([hidden1, hidden2]))  ## 
-  b2 = tf.Variable(tf.zeros([hidden2])) ## biais pour les hidden neurones cachés
-  layer_2 = tf.sigmoid(tf.matmul(layer_1,W2) + b2)
-with tf.name_scope("layer_3"):
-  W3 = tf.Variable(tf.random_normal([hidden2, hidden3]))  ## 
-  b3 = tf.Variable(tf.zeros([hidden3])) ## biais pour les hidden neurones cachés
-  layer_3 = tf.sigmoid(tf.matmul(layer_2,W3) + b3)
+  print("shape of x : ",x.shape)
+  W = tf.Variable(tf.random_normal([2, hidden]))  ## 
+  b = tf.Variable(tf.zeros([hidden])) ## biais pour les hidden neurones cachés
+  layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
 with tf.name_scope("out_layer"):
-  ##print("shape of layer_1 : ",layer_1.shape)
-  print("dans le réseau!")
-  Wo = tf.Variable(tf.random_normal([hidden3,1])) ##
-  bo = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
-  y_pred = tf.sigmoid(tf.matmul(layer_3,Wo) + bo)
-  print("y_pred = ",y_pred)
+    ##print("shape of layer_1 : ",layer_1.shape)
+    W1 = tf.Variable(tf.random_normal([hidden_3,1])) ##
+    b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
+    yy = tf.matmul(layer_3,W1) + b1
+    y_sigm = tf.sigmoid(yy)
+    y_pred = tf.round(y_sigm)
+    print("shape of y_pred : ",y_pred.shape)
 with tf.name_scope("loss"): #fonction de perte
-    l = tf.losses.mean_squared_error(y, y_pred)
+    entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
+    l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
 with tf.name_scope("optim"): #fonction d'optimisation
     train_op = tf.train.AdamOptimizer(.1).minimize(l)
 
@@ -51,7 +37,7 @@ with tf.name_scope("optim"): #fonction d'optimisation
 with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
   tf.summary.scalar("loss", l)
   merged = tf.summary.merge_all()
-
+'''
 TIME_DELTA = 0.1
 FPS = 30
 SCREENWIDTH  = 288
@@ -60,7 +46,7 @@ PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
-temps = 1
+
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
     # red bird
@@ -101,8 +87,6 @@ try:
 except NameError:
     xrange = range
 
-def sigmoid(x) :
-    return 1./(1+np.exp(-x))
 
 def main():
     global SCREEN, FPSCLOCK
@@ -237,8 +221,6 @@ def showWelcomeAnimation():
 
 
 def mainGame(movementInfo):
-    temps = time.time()
-    print("main, temps: ",temps)
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
     playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
@@ -275,77 +257,23 @@ def mainGame(movementInfo):
     playerFlapAcc =  -9   # players speed on flapping
     playerFlapped = False # True when player flaps
 
-    n = 0;
-    W1f=0;
-    b1f=0;
-    W2f=0;
-    b2f=0;
-    W3f=0;
-    b3f=0;
-    Wof=0;
-    bof=0;
-    while True:
-        print("temps : ",time.time())
-        labs = time.time() - temps
-        if labs > TIME_DELTA:
-            print("here, time delta")
-            temps = time.time()
-            x_feed = [[playerx,playery,upperPipes[0]['x'],upperPipes[0]['y'],lowerPipes[0]['y']]]
-            if(n==0):
-                lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                pred = sigmoid(np.dot(lay3,Wof) + bof)
-                yatt = 0;
-                ###yatt = tf.reshape(y,[1,1])
-                feed_dict = {x: x_feed, y: [[yatt]]}
-                with tf.Session() as sess:
-                    sess.run(tf.global_variables_initializer())
-                    _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-                    W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
-                    lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                    lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                    lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                    res = sigmoid(np.dot(lay3,Wof) + bof)
-                print(res)
-                if (res >0.5):
-                    playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
-                n = n+1;
 
-            if(n>0):
-                lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                pred = sigmoid(np.dot(lay3,Wof) + bof)
-                feed_dict = {x: x_feed, y: pred}
-                with tf.Session() as sess:
-                    sess.run(tf.global_variables_initializer())
-                    _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-                    W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
-                    lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                    lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                    lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                    res = sigmoid(np.dot(lay3,Wof) + bof)
-                print(res)
-                if (res>0.5):
-                    playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
-        '''for event in pygame.event.get():
+    while True:
+        labs = time.time() - temps
+        for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             ##if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP): ## doit devenir (en pseudo-code:) if (pas de temps écoulé)
-
+            if labs > TIME_DELTA:
                 if playery > -2 * IMAGES['player'][0].get_height():
-                    playerVelY = playerFlapAcc #### AURELIEN : action par rapport à la touche pressée de l'utilisateur : à changer par rapport au rdn.
-                    ##res = sess.run(y_pred,feed_dict = {x:x_test})
+                    ##playerVelY = playerFlapAcc #### AURELIEN : action par rapport à la touche pressée de l'utilisateur : à changer par rapport au rdn.
+                    print("here")
+                    res = sess.run(y_pred,feed_dict = {x:x_test})
                     playerFlapped = True
                     SOUNDS['wing'].play()
                     temps = time.time()
-        '''
+
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
