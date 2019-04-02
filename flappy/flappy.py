@@ -5,8 +5,39 @@ import sys
 import pygame
 from pygame.locals import *
 import time
+import tensorflow as tf
+
+temps = time.time()
+
+hidden = 16;
+
+'''
+with tf.name_scope("placeholders"): #données d'entrée
+    x = tf.placeholder(tf.float32, (5,1))
+with tf.name_scope("layer_1"):
+  print("shape of x : ",x.shape)
+  W = tf.Variable(tf.random_normal([2, hidden]))  ## 
+  b = tf.Variable(tf.zeros([hidden])) ## biais pour les hidden neurones cachés
+  layer_1 = tf.sigmoid(tf.matmul(x,W) + b)
+with tf.name_scope("out_layer"):
+    ##print("shape of layer_1 : ",layer_1.shape)
+    W1 = tf.Variable(tf.random_normal([hidden_3,1])) ##
+    b1 = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
+    yy = tf.matmul(layer_3,W1) + b1
+    y_sigm = tf.sigmoid(yy)
+    y_pred = tf.round(y_sigm)
+    print("shape of y_pred : ",y_pred.shape)
+with tf.name_scope("loss"): #fonction de perte
+    entropy = tf.nn.sigmoid_cross_entropy_with_logits(logits = yy,labels  = y)
+    l = tf.reduce_sum(entropy) ## on minimise l'erreur quadratique moyenne
+with tf.name_scope("optim"): #fonction d'optimisation
+    train_op = tf.train.AdamOptimizer(.1).minimize(l)
 
 
+with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
+  tf.summary.scalar("loss", l)
+  merged = tf.summary.merge_all()
+'''
 TIME_DELTA = 0.1
 FPS = 30
 SCREENWIDTH  = 288
@@ -15,7 +46,7 @@ PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
-temps = 1
+
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
     # red bird
@@ -190,8 +221,6 @@ def showWelcomeAnimation():
 
 
 def mainGame(movementInfo):
-    temps = time.time()
-    print("main, temps: ",temps)
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
     playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
@@ -230,32 +259,21 @@ def mainGame(movementInfo):
 
 
     while True:
-        print("temps : ",time.time())
         labs = time.time() - temps
-        if labs > TIME_DELTA:
-            print("here, time delta")
-            temps = time.time()
-            x_feed_pipes= []
-            x_feed = []
-            
-            upperPipes = [
-        {'x': SCREENWIDTH + 200, 'y': newPipe1[0]['y']},
-        {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[0]['y']},
-    		]
-
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-            #if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP): ## doit devenir (en pseudo-code:) if (pas de temps écoulé)
-
+            ##if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP): ## doit devenir (en pseudo-code:) if (pas de temps écoulé)
+            if labs > TIME_DELTA:
                 if playery > -2 * IMAGES['player'][0].get_height():
-                    playerVelY = playerFlapAcc #### AURELIEN : action par rapport à la touche pressée de l'utilisateur : à changer par rapport au rdn.
-                    ##res = sess.run(y_pred,feed_dict = {x:x_test})
+                    ##playerVelY = playerFlapAcc #### AURELIEN : action par rapport à la touche pressée de l'utilisateur : à changer par rapport au rdn.
+                    print("here")
+                    res = sess.run(y_pred,feed_dict = {x:x_test})
                     playerFlapped = True
                     SOUNDS['wing'].play()
                     temps = time.time()
-        
+
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
