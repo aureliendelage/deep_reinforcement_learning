@@ -2,22 +2,61 @@ import sys
 import os
 import random
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+
+
+'''#premier plateau
 
 #propriétés du plateau
-width = 10
+width = 5
+height = 4
+states_n = width*height
+actions_n = 4
+
+#positionnement des éléments
+hole = [[1,2]]
+malusHole = [-10]
+wall = [[3,0]]
+end = [[3,4]]
+bonusEnd = [10]
+position = [0,0]
+
+'''
+
+'''
+#2nd plateau
+
+#propriétés du plateau
+width = 5
+height = 5
+states_n = width*height
+actions_n = 4
+
+#positionnement des éléments
+hole = [[2,0]]
+malusHole = [-10]
+wall = [[1,1],[1,2],[1,3],[2,1],[3,1]]
+end = [[0,4],[4,0]]
+bonusEnd = [10,30]
+position = [0,0]
+'''
+
+#3e plateau
+
+#propriétés du plateau
+width = 7
 height = 6
 states_n = width*height
 actions_n = 4
-t=0
 
 #positionnement des éléments
-hole = [[1,2],[4,4],[2,8]]
-malusHole = [-15,-20,-20]
-wall = [[3,0],[5,8]]
-end = [[3,4],[5,3]]
-bonusEnd = [1,100]
+hole = [[1,2],[1,5],[5,5]]
+malusHole = [-10,-30,-20]
+wall = [[3,0],[4,4],[2,4],[0,4]]
+end = [[3,4],[0,6],[5,6]]
+bonusEnd = [10, 70,50]
 position = [0,0]
+
 
 #fonction de récompense imédiate associée a la position sur le plateau
 r = np.zeros([height,width])
@@ -29,11 +68,11 @@ for i in range(len(end)) :
 #fonction de valeur
 Q = np.zeros([states_n,actions_n])
 
-#paramètres de l'epérience
-gamma = 0.99
-probExp = 0.9
+#paramètres de l'expérience
+gamma = 0.95
+probNoSlip = 0.9
 
-def calculCoeffExp(i,N) :
+def calculEpsilon(i,N) :
 	"""calcul le coefficient d'exploration.
 	Varie de manière linéaire sur N expériences"""
 	c = (2*N-i)/(2*N)
@@ -135,24 +174,31 @@ def realMove(dir,param) :
 		newdir = (dir+1)%4
 	move(newdir)
 
-def isEnded() :
+def isEnded(t=0) :
 	"""indique si le jeu est fini"""
-	if isEnd(position) or isHole(position) :
+	if (isEnd(position) or (t>states_n*10)) : # on s'arrete aussi au bout d'un certain nombre d'actions
 		return True
 	return False
 
-def choixDirection() :
+def explore() :
+	return random.randrange(4)
+
+def exploit() :
+	return np.argmax(Q[coord2num(position)])
+
+
+def choixDirection(epsilon) :
 	"""choisi une direction"""
 	a = random.random()
-	if a<coeffExploration : #cas d'exploration
-		return random.randrange(4)
+	if a<epsilon : #cas d'exploration
+		return explore()
 	else : #cas d'exploitation
-		return np.argmax(Q[coord2num(position)])
+		return exploit()
 
 
+########################### Entrainement #################################
 
-
-N = 10000 #nombre d'epériences
+N = 10000 #nombre d'expériences
 
 #listes utiles pour affichage de la courbe de la somme de Q
 tmp = [i for i in range(N+1)]
@@ -163,21 +209,21 @@ for i in range(N) :
 
 	#on se replace au début, le temps est nul, et maj du coefficient d'exploration
 	position=[0,0]
+	epsilon =calculEpsilon(i,N)
 	t=0
-	coeffExploration = calculCoeffExp(i,N)
 	
+	#maj du coefficient alpha
+	alpha = 1/(i+1)
 
-	while not isEnded() : #on joue jusqu'à la fin
-		
-		#maj du temps et du coefficient alpha
+	while not isEnded(t) : #on joue jusqu'à la fin
+
 		t+=1
-		alpha = 1/t
 
-		direction = choixDirection() #choix de la direction dans laquelle on va se déplacer
+		direction = choixDirection(epsilon) #choix de la direction dans laquelle on va se déplacer
 
 		#calcul du nouvel état a partir de la position actuelle et de la direction choisie
 		oldState = coord2num(position)
-		realMove(direction,probExp)
+		realMove(direction,probNoSlip)
 		newState = coord2num(position)
 
 		#maj de la fonction Q
@@ -186,6 +232,9 @@ for i in range(N) :
 	
 	sumQ.append(sommeQ(Q)) #maj de la somme des valeurs de Q
 	
+
+######################## Fin de l'entrainement ##################################
+
 
 def indice(liste,elem) :
 	for i in range(len(liste)) :
@@ -239,8 +288,10 @@ def parcours() :
 		move(direction)
 
 affSol()
-
+'''
 #affichage de l'évolution de la somme des valeurs de Q
 plt.plot(tmp, sumQ)
-#plt.show()
-#plt.figure()
+plt.show()
+plt.figure()
+'''
+print(Q)
