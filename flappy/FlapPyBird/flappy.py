@@ -10,7 +10,7 @@ import time
 import tensorflow as tf
 import numpy as np
 
-
+alpha = 0.05
 
 hidden = 16;
 hidden1 = 16;
@@ -43,7 +43,7 @@ with tf.name_scope("out_layer"):
   y_pred = tf.sigmoid(tf.matmul(layer_3,Wo) + bo)
   print("y_pred = ",y_pred)
 with tf.name_scope("loss"): #fonction de perte
-    l = tf.losses.mean_squared_error(y, y_pred)
+    l = tf.losses.mean_squared_error(y, y_pred) ## AURELIEN, A CHANGER
 with tf.name_scope("optim"): #fonction d'optimisation
     train_op = tf.train.AdamOptimizer(.1).minimize(l)
 
@@ -52,7 +52,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
   tf.summary.scalar("loss", l)
   merged = tf.summary.merge_all()
 
-TIME_DELTA = 0.1
+TIME_DELTA = 0.5
 FPS = 30
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
@@ -179,8 +179,8 @@ def main():
         )
 
         movementInfo = showWelcomeAnimation()
-        crashInfo = mainGame(movementInfo)
-        showGameOverScreen(crashInfo)
+        while (1):
+            crashInfo = mainGame(movementInfo)
 
 
 def showWelcomeAnimation():
@@ -285,7 +285,11 @@ def mainGame(movementInfo):
     Wof=0;
     bof=0;
     while True:
+        playerHeight = IMAGES['player'][playerIndex].get_height()
         print("temps : ",time.time())
+        print("je suis à : x = ",playerx,"et à y = ",
+                playery)
+        print ("aurelien : ",playery + playerHeight)
         labs = time.time() - temps
         if labs > TIME_DELTA:
             print("here, time delta")
@@ -539,6 +543,10 @@ def checkCrash(player, upperPipes, lowerPipes):
     player['w'] = IMAGES['player'][0].get_width()
     player['h'] = IMAGES['player'][0].get_height()
 
+
+    if player['y'] + player['h']<0:
+        print("J'AI PASSÉ LE HAUT")
+        return [True, True]
     # if player crashes into ground
     if player['y'] + player['h'] >= BASEY - 1:
         return [True, True]
