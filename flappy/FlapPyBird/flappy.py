@@ -52,6 +52,7 @@ with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction d
   tf.summary.scalar("loss", l)
   merged = tf.summary.merge_all()
 
+SPEEDUP = 1 #acceleration du jeu
 TIME_DELTA = 0.5
 FPS = 30
 SCREENWIDTH  = 288
@@ -233,11 +234,11 @@ def showWelcomeAnimation():
         SCREEN.blit(IMAGES['base'], (basex, BASEY))
 
         pygame.display.update()
-        FPSCLOCK.tick(FPS)
+        FPSCLOCK.tick(FPS*SPEEDUP)
 
 
 def mainGame(movementInfo):
-    temps = time.time()
+    temps = time.time()*10
     print("main, temps: ",temps)
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
@@ -431,7 +432,7 @@ def mainGame(movementInfo):
         SCREEN.blit(playerSurface, (playerx, playery))
 
         pygame.display.update()
-        FPSCLOCK.tick(FPS)
+        FPSCLOCK.tick(FPS*SPEEDUP)
 
 
 def showGameOverScreen(crashInfo):
