@@ -9,6 +9,17 @@ from pygame.locals import *
 import time
 import tensorflow as tf
 import numpy as np
+sess = tf.Session();
+gamma = 0.99
+reward = 0
+x_feed = [[0,0,0,0]]
+last_y = [[0,0]]
+def predire(x_feed,W1f,b1f,W2f,b2f,W3f,b3f,Wof,bof):
+    lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
+    lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
+    lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
+    res = sigmoid(np.dot(lay3,Wof) + bof)
+    return res
 
 alpha = 0.05
 
@@ -18,11 +29,11 @@ hidden2 = 16;
 hidden3 = 16;
 
 N = 1;
-taille_entree = 5;
+taille_entree = 4;
 
 with tf.name_scope("placeholders"): #données d'entrée
-    x = tf.placeholder(tf.float32, (1,5))
-    y = tf.placeholder(tf.float32,(1,1))
+    x = tf.placeholder(tf.float32, (1,4))
+    y = tf.placeholder(tf.float32,(1,2))
 with tf.name_scope("layer_1"):
   W1 = tf.Variable(tf.random_normal([taille_entree, hidden1]))  ## 
   b1 = tf.Variable(tf.zeros([hidden1])) ## biais pour les hidden neurones cachés
@@ -38,12 +49,12 @@ with tf.name_scope("layer_3"):
 with tf.name_scope("out_layer"):
   ##print("shape of layer_1 : ",layer_1.shape)
   print("dans le réseau!")
-  Wo = tf.Variable(tf.random_normal([hidden3,1])) ##
-  bo = tf.Variable(tf.zeros([1])) ## biais pour les 2 classes de sortie (output).
+  Wo = tf.Variable(tf.random_normal([hidden3,2])) ##
+  bo = tf.Variable(tf.zeros([2])) ## biais pour les 2 classes de sortie (output).
   y_pred = tf.sigmoid(tf.matmul(layer_3,Wo) + bo)
   print("y_pred = ",y_pred)
 with tf.name_scope("loss"): #fonction de perte
-    l = tf.losses.mean_squared_error(y, y_pred) ## AURELIEN, A CHANGER
+    l = tf.losses.mean_squared_error(y[0][0], y_pred[0][0]) ## AURELIEN, A CHANGER
 with tf.name_scope("optim"): #fonction d'optimisation
     train_op = tf.train.AdamOptimizer(.1).minimize(l)
 
@@ -105,6 +116,8 @@ def sigmoid(x) :
     return 1./(1+np.exp(-x))
 
 def main():
+    global reward;
+    sess.run(tf.global_variables_initializer())
     global SCREEN, FPSCLOCK
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
@@ -180,8 +193,14 @@ def main():
 
         movementInfo = showWelcomeAnimation()
         while (1):
+            '''
+            y_att = [[gamma*last_y[0][0]-1,gamma*last_y[0][1]-1]]
+            feed_dict = {x: x_feed, y: y_att}
+            _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
+            print("loss, new game: ",loss)'''
+            reward = -1
             crashInfo = mainGame(movementInfo)
-
+            ## A CHANGER, JE DOIS FEED LE RESEAU AVEC UNE RECOMPENSE DE GAME OVER (NEGATIVE)
 
 def showWelcomeAnimation():
     """Shows welcome screen animation of flappy bird"""
@@ -237,8 +256,9 @@ def showWelcomeAnimation():
 
 
 def mainGame(movementInfo):
+    global reward;
     temps = time.time()
-    print("main, temps: ",temps)
+    ##print("main, temps: ",temps)
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
     playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
@@ -276,68 +296,56 @@ def mainGame(movementInfo):
     playerFlapped = False # True when player flaps
 
     n = 0;
-    W1f=0;
-    b1f=0;
-    W2f=0;
-    b2f=0;
-    W3f=0;
-    b3f=0;
-    Wof=0;
-    bof=0;
+    W1f=1;
+    b1f=1;
+    W2f=1;
+    b2f=1;
+    W3f=1;
+    b3f=1;
+    Wof=1;
+    bof=1;
     while True:
+        global x_feed
+        global last_y
         playerHeight = IMAGES['player'][playerIndex].get_height()
-        print("temps : ",time.time())
-        print("je suis à : x = ",playerx,"et à y = ",
-                playery)
-        print ("aurelien : ",playery + playerHeight)
+        ##print("temps : ",time.time())
+        ##print("je suis à : x = ",playerx,"et à y = ",
+          ##      playery)
+        ##print ("aurelien : ",playery + playerHeight)
         labs = time.time() - temps
         if labs > TIME_DELTA:
-            print("here, time delta")
+            ##print("here, time delta")
             temps = time.time()
-            x_feed = [[playerx,playery,upperPipes[0]['x'],upperPipes[0]['y'],lowerPipes[0]['y']]]
-            if(n==0):
-                lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                pred = sigmoid(np.dot(lay3,Wof) + bof)
-                yatt = 0;
-                ###yatt = tf.reshape(y,[1,1])
-                feed_dict = {x: x_feed, y: [[yatt]]}
-                with tf.Session() as sess:
-                    sess.run(tf.global_variables_initializer())
-                    _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-                    W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
-                    lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                    lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                    lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                    res = sigmoid(np.dot(lay3,Wof) + bof)
-                print(res)
-                if (res >0.5):
-                    playerVelY = playerFlapAcc
-                    playerFlapped = True
-                    SOUNDS['wing'].play()
-                n = n+1;
+            if (n>=0): ##je dois feed le réseau
+                y_att = [[gamma*last_y[0][0]+reward,gamma*last_y[0][1]+reward]]
+                print("je feed avec : y_att = ",y_att)
+                feed_dict = {x: x_feed, y: y_att}
+                _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
+                print("step %d, loss: %f" % (n, loss))
 
-            if(n>0):
-                lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                pred = sigmoid(np.dot(lay3,Wof) + bof)
-                feed_dict = {x: x_feed, y: pred}
-                with tf.Session() as sess:
-                    sess.run(tf.global_variables_initializer())
-                    _, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
-                    W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
-                    lay1 = sigmoid(np.dot(x_feed,W1f) + b1f)
-                    lay2 = sigmoid(np.dot(lay1,W2f) + b2f)
-                    lay3 = sigmoid(np.dot(lay2,W3f) + b3f)
-                    res = sigmoid(np.dot(lay3,Wof) + bof)
-                print(res)
-                if (res>0.5):
+            if(n>=0):
+                print("je suis ici");
+                W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
+                rep = predire(x_feed,W1f,b1f,W2f,b2f,W3f,b3f,Wof,bof)
+                print(rep)
+                if (rep[0][1]>0.5):
                     playerVelY = playerFlapAcc
                     playerFlapped = True
                     SOUNDS['wing'].play()
-        '''for event in pygame.event.get():
+                    x_feed = [[playery + playerHeight,upperPipes[0]['x'],upperPipes[0]['y'],lowerPipes[0]['y']]]
+                    last_y = rep;
+                    print("changement, last_y = ",last_y);
+
+            '''if(n>0):
+                x_feed = [[playery + playerHeight,upperPipes[0]['x'],upperPipes[0]['y'],lowerPipes[0]['y']]]
+                W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
+                rep = predire(x_feed,W1f,b1f,W2f,b2f,W3f,b3f,Wof,bof)
+                print(rep)
+                if (rep[0][1]>0.01):
+                    playerVelY = playerFlapAcc
+                    playerFlapped = True
+                    SOUNDS['wing'].play()
+        for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
@@ -370,6 +378,7 @@ def mainGame(movementInfo):
         for pipe in upperPipes:
             pipeMidPos = pipe['x'] + IMAGES['pipe'][0].get_width() / 2
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
+                reward = 1
                 score += 1
                 SOUNDS['point'].play()
 
