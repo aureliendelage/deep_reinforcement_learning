@@ -21,7 +21,7 @@ taille_echantillon = 100
 state_temp = [0,0,0,0,0,0]
 alpha = 0.1 ##to be changed
 gamma = 0.9
-coeff_explo = 0.0 ##to be changed
+coeff_explo = 0.9 ##to be changed
 def train_network(batch,taille_batch,taille_entree,N):
   global alpha;
   global coeff_explo;
@@ -46,7 +46,7 @@ def train_network(batch,taille_batch,taille_entree,N):
   	bo = tf.Variable(tf.zeros([2])) ## biais pour les 2 classes de sortie (output).
   	y_pred = tf.matmul(layer_3,Wo) + bo ## pas de sigmoïde ! On veut des Q-valeurs. 
   with tf.name_scope("losses"): #fonction de perte
-  	l = tf.losses.mean_squared_error((1-alpha)*y, alpha*y_pred)
+  	l = tf.losses.mean_squared_error((1-alpha)*y_pred, alpha*y)
   with tf.name_scope("optim"): #fonction d'optimisation
   	train_op = tf.train.AdamOptimizer(1e-4).minimize(l)
   with tf.name_scope("summaries"): #pour sauvegarder l'évolution de la fonction de perte
@@ -66,7 +66,6 @@ def train_network(batch,taille_batch,taille_entree,N):
     	W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
     	if (etape%taille_echantillon == 0 and len(batch)>taille_echantillon):## toutes les 100 étapes, on prend un échantillon du batch, et on rétro-propage le gradient.
     		t = t+1
-    		coeff_explo = coeff_explo + 1/(5*t)
     		alpha = 1/t
     		etape = 0; ## on réinitialise
     		loss_moyenne = 0 
