@@ -107,7 +107,7 @@ def train_network(batch,taille_batch,taille_entree,N):
     	batch.append([ancien_etat,action,reward,state]) ## on sauvegarde l'état.
 
     	prochaine_action = Q_valeur(W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof,state);
-    	print("le réseau veut sauter à : ",prochaine_action[0],"et ne pas sauter à ",prochaine_action[1]);
+    	print("le réseau veut sauter à : ",prochaine_action[1],"et ne pas sauter à ",prochaine_action[0]);
   
 
 
