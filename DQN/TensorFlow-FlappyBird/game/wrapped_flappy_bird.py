@@ -60,7 +60,7 @@ class GameState:
     def frame_step(self, input_actions):
         pygame.event.pump()
 
-        reward = 50
+        reward = 0.1
         terminal = False
 
         if sum(input_actions) != 1:
@@ -81,7 +81,7 @@ class GameState:
             if pipeMidPos <= playerMidPos < pipeMidPos + 4:
                 self.score += 1
                 #SOUNDS['point'].play()
-                reward = 100
+                reward = 1
 
         # playerIndex basex change
         if (self.loopIter + 1) % 3 == 0:
@@ -123,7 +123,7 @@ class GameState:
             #SOUNDS['die'].play()
             terminal = True
             self.__init__()
-            reward = -100
+            reward = -1
 
         # draw sprites
         SCREEN.blit(IMAGES['background'], (0,0))
