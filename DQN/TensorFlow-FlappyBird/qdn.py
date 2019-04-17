@@ -63,9 +63,9 @@ def train_network(batch,taille_batch,taille_entree,N):
 		t = 0
 		terminal = False;
 		image,reward,_,state  = game_state.frame_step([1,0])
+		W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
 		while (True):
 			##print("je suis à x = ",state[0],"y : ",state[1]," pipes :",state[2]);
-			W1f, b1f, W2f, b2f, W3f, b3f, Wof, bof = sess.run([W1, b1, W2, b2, W3, b3, Wo, bo])
 			if (etape%taille_echantillon == 0 and len(batch)>taille_echantillon):## toutes les 100 étapes, on prend un échantillon du batch, et on rétro-propage le gradient.
 				t = t+1
 				alpha = 1/t
@@ -86,7 +86,7 @@ def train_network(batch,taille_batch,taille_entree,N):
 						if (not terminal) : ## c'est dans ce qu'ils ont fait, je ne comprends pas.
 							y_dict.append(np.asarray((np.asarray(max_Q)*gamma+echantillon[i][2])));## [2] désigne le reward de la transition i
 						else:
-							y_dict.append(np.asarray(echantillon[i][2]));
+							y_dict.append(np.asarray([echantillon[i][2],echantillon[i][2]]));
 					feed_dict = {x: x_dict,y: y_dict}
 					_, summary, loss = sess.run([train_op, merged, l], feed_dict=feed_dict)
 					loss_moyenne = loss_moyenne+loss;
