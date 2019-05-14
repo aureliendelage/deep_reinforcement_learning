@@ -2,7 +2,7 @@ import sys
 import os
 import random
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 '''#premier plateau
@@ -23,7 +23,7 @@ position = [0,0]
 
 '''
 
-'''
+
 #2nd plateau
 
 #propriétés du plateau
@@ -31,16 +31,18 @@ width = 5
 height = 5
 states_n = width*height
 actions_n = 4
+nb_train = 1000
 
 #positionnement des éléments
 hole = [[2,0]]
 malusHole = [-10]
 wall = [[1,1],[1,2],[1,3],[2,1],[3,1]]
 end = [[0,4],[4,0]]
-bonusEnd = [10,30]
+bonusEnd = [10,20]
 position = [0,0]
-'''
 
+
+"""
 #3e plateau
 
 #propriétés du plateau
@@ -50,12 +52,12 @@ states_n = width*height
 actions_n = 4
 
 #positionnement des éléments
-hole = [[1,2],[1,5],[5,5]]
-malusHole = [-10,-30,-20]
+hole = [[1,2],[1,5]]
+malusHole = [-10,-30]
 wall = [[3,0],[4,4],[2,4],[0,4]]
 end = [[3,4],[0,6],[5,6]]
 bonusEnd = [10, 70,50]
-position = [0,0]
+position = [0,0]"""
 
 
 #fonction de récompense imédiate associée a la position sur le plateau
@@ -75,7 +77,7 @@ probNoSlip = 0.9
 def calculEpsilon(i,N) :
 	"""calcul le coefficient d'exploration.
 	Varie de manière linéaire sur N expériences"""
-	c = (2*N-i)/(2*N)
+	c = (N-i)/(N)
 	return c
 
 def coord2num(c) :
@@ -198,42 +200,48 @@ def choixDirection(epsilon) :
 
 ########################### Entrainement #################################
 
-N = 10000 #nombre d'expériences
+#N = 5000 #nombre d'expériences
 
 #listes utiles pour affichage de la courbe de la somme de Q
-tmp = [i for i in range(N+1)]
+
+tmp = [i for i in range(nb_train+1)]
 sumQ = [0]
 
-#début de l'entrainement
-for i in range(N) :
 
-	#on se replace au début, le temps est nul, et maj du coefficient d'exploration
-	position=[0,0]
-	epsilon =calculEpsilon(i,N)
-	t=0
-	
-	#maj du coefficient alpha
-	alpha = 1/(i+1)
+def entrainement(N) :
+	global Q,position
+	Q = np.zeros([states_n,actions_n])
 
-	while not isEnded(t) : #on joue jusqu'à la fin
+	for i in range(N) :
 
-		t+=1
+		#on se replace au début, le temps est nul, et maj du coefficient d'exploration
+		position=[0,0]
+		epsilon =calculEpsilon(i,N)
+		t=0
+		
+		#maj du coefficient alpha
+		alpha = 1/(i+1)
 
-		direction = choixDirection(epsilon) #choix de la direction dans laquelle on va se déplacer
+		while not isEnded(t) : #on joue jusqu'à la fin
 
-		#calcul du nouvel état a partir de la position actuelle et de la direction choisie
-		oldState = coord2num(position)
-		realMove(direction,probNoSlip)
-		newState = coord2num(position)
+			t+=1
 
-		#maj de la fonction Q
-		Q[oldState,direction] = (1-alpha)*Q[oldState,direction] + alpha*(r[position[0],position[1]]+gamma*max(Q[newState]))
-	
-	
-	sumQ.append(sommeQ(Q)) #maj de la somme des valeurs de Q
-	
+			direction = choixDirection(epsilon) #choix de la direction dans laquelle on va se déplacer
 
-######################## Fin de l'entrainement ##################################
+			#calcul du nouvel état a partir de la position actuelle et de la direction choisie
+			oldState = coord2num(position)
+			realMove(direction,probNoSlip)
+			newState = coord2num(position)
+
+			#maj de la fonction Q
+			Q[oldState,direction] = (1-alpha)*Q[oldState,direction] + alpha*(r[position[0],position[1]]+gamma*max(Q[newState]))
+		
+		
+		#sumQ.append(sommeQ(Q)) #maj de la somme des valeurs de Q
+		
+
+	######################## Fin de l'entrainement ##################################
+
 
 
 def indice(liste,elem) :
@@ -274,7 +282,11 @@ def affSol():
 	string+="\n"
 	print(string)
 
-
+def trouver_arrivee() :
+	for k in range(len(end)) :
+		if np.equal(position,end[k]).all() :
+			return k
+	return -1
 
 
 def parcours() :
@@ -287,11 +299,15 @@ def parcours() :
 		direction = np.argmax(Q[coord2num(position)])
 		move(direction)
 
-affSol()
-'''
+for inc in range(10) :
+	entrainement(nb_train)
+	affSol()
+	fin = trouver_arrivee()
+	print("fin n°",fin)
+"""
 #affichage de l'évolution de la somme des valeurs de Q
 plt.plot(tmp, sumQ)
 plt.show()
 plt.figure()
-'''
-print(Q)
+"""
+#print(Q)
